@@ -10,13 +10,15 @@ const categories: Category[] = [];
 categoriesRoutes.post("/", (request, response) => {
   const { name, description } = request.body;
 
-  const category = new Category();
+  const categoryAlreadyExists = categoriesRepository.findByName(name);
 
-  Object.assign(category, { name, description, created_at: new Date() });
+  if (categoryAlreadyExists) {
+    return response.status(400).json({ error: "Category Already exists!" });
+  }
 
-  categories.push(category);
+  categoriesRepository.create({ name, description });
 
-  return response.status(201).send({ category: category });
+  return response.status(201).send();
 });
 
 categoriesRoutes.get("/", (request, response) => {
